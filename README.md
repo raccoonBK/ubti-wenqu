@@ -2,6 +2,9 @@
 
 未央黑客松 WeYoung Hackathon 2026 · 赛道二「你好，我的大学」
 
+**在线体验：https://raccoonbk.github.io/ubti-wenqu/**
+**源码仓库：https://github.com/raccoonBK/ubti-wenqu**
+
 > 别人都在做"扮演一个大一新生去聊天"的模拟器。我们不。
 > 先用 UBTI 认出你是十六型里的哪一种，再把你写下的忐忑，预演成一幕幕会发生的大学日常。
 > 你的期待和焦虑，变成你的作品。
