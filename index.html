@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UBTI · 先认清你是什么人，再预演你的大学生活</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">UBTI · 问渠衍生</div>
+    <button class="linkbtn" id="settingsToggle">配置 Key</button>
+  </div>
+
+  <!-- 落地 -->
+  <section class="screen active" id="landing">
+    <div class="kicker">未央黑客松 · 赛道二</div>
+    <h1>先认清你是什么人，<br/>再预演你的大学生活。</h1>
+    <p class="lead">
+      别人都在做"扮演一个大一新生去聊天"的模拟器。我们不。
+      新生真正的焦虑不是流程不知道，而是"我进了新群体，会不会是那个落下的"。
+      所以先用 <b>UBTI</b> 认出你是十六型里的哪一种，再让 AI 把你写下的忐忑，预演成一幕幕会发生的大学日常。
+      你的期待和焦虑，变成你的作品。
+    </p>
+    <div class="row"><button class="btn" id="startBtn">开始测我的 UBTI</button></div>
+  </section>
+
+  <!-- 测验 -->
+  <section class="screen" id="quiz">
+    <div class="progress"><span id="progBar"></span></div>
+    <div class="q-count" id="qCount"></div>
+    <div class="q-text" id="qText"></div>
+    <div class="options" id="qOptions"></div>
+  </section>
+
+  <!-- 类型卡 -->
+  <section class="screen" id="result">
+    <div class="kicker">你的 UBTI 类型</div>
+    <div class="arch-card">
+      <img class="avatar" id="archAvatar" alt="角色形象" />
+      <div class="arch-main">
+        <div class="arch-code" id="archCode"></div>
+        <div class="arch-words" id="archWords"></div>
+        <div class="arch-name" id="archName"></div>
+        <div class="arch-tag" id="archTag"></div>
+        <div class="arch-desc" id="archDesc"></div>
+        <div class="arch-split">
+          <div class="split-item">
+            <span class="split-k">可爱之处</span>
+            <span class="split-v" id="archCute"></span>
+          </div>
+          <div class="split-item">
+            <span class="split-k">盲点提醒</span>
+            <span class="split-v" id="archBlind"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dim-box" id="dimBars"></div>
+    <div class="row" style="margin-top:20px;">
+      <button class="btn" id="toAnxietyBtn">把我的忐忑写下来，预演四年</button>
+    </div>
+  </section>
+
+  <!-- 焦虑 -->
+  <section class="screen" id="anxiety">
+    <h2>把你带来的忐忑写下来</h2>
+    <p class="lead">一句也行。对大学的期待、害怕、说不清的不安——写下来，它会成为下面预演的主线。</p>
+    <textarea id="anxietyInput" placeholder="比如：怕一个人吃饭，怕跟不上，怕交不到真朋友……"></textarea>
+    <div class="row" style="margin-top:22px;">
+      <button class="btn" id="previewBtn">生成我的大学预演</button>
+    </div>
+  </section>
+
+  <!-- 加载 -->
+  <section class="screen" id="loading">
+    <div class="loader">
+      <div class="spinner"></div>
+      <p class="lead" id="loadingText">正在把你写下的忐忑，预演成会发生的日常……</p>
+    </div>
+  </section>
+
+  <!-- 预演结果 -->
+  <section class="screen" id="preview">
+    <h2>你的大学预演卡</h2>
+    <div class="arch-card compact">
+      <img class="avatar sm" id="previewAvatar" alt="角色形象" />
+      <div class="arch-main">
+        <div class="arch-code" id="prevCode"></div>
+        <div class="arch-desc" id="archAnxiety" style="margin-top:6px;"></div>
+      </div>
+    </div>
+    <div id="scenes"></div>
+    <div class="row" style="margin-top:24px;">
+      <button class="btn clay" id="toDailyBtn">去问渠，答一道今日之问 →</button>
+      <button class="btn ghost" id="printBtn">导出这张卡</button>
+      <button class="btn ghost" id="restartBtn">重新测</button>
+    </div>
+    <p class="footer-note" id="engineNote"></p>
+  </section>
+
+  <!-- 每日一问引流 -->
+  <section class="screen" id="daily">
+    <div class="kicker">问渠 · 每日一问</div>
+    <h2>先答一道，看看它问得有多狠</h2>
+    <p class="lead">
+      预演是替你把四年演一遍。而问渠做的事更难：它每天只问你一道题，不长、不鸡汤、
+      不绕弯子，只问你自己。下面是题库里的一问，你可以真的答一句。
+    </p>
+    <div class="daily-box">
+      <div class="daily-q" id="dailyQ"></div>
+      <textarea id="dailyAnswer" placeholder="照实写一句就行，写给自己的。"></textarea>
+      <div class="row" style="margin-top:14px;">
+        <button class="btn" id="dailySubmit">回答</button>
+        <button class="btn ghost" id="dailyShuffle">换一问</button>
+      </div>
+      <div class="daily-follow hidden" id="dailyFollow"></div>
+    </div>
+
+    <div class="cta">
+      <div class="cta-text">
+        <div class="cta-title">问渠</div>
+        <div class="cta-sub">每天一道犀利的问题，替你记着你自己。</div>
+        <div class="cta-note">扫码关注小红书 @鱼一朵</div>
+        <div class="cta-note dim">问渠还在上架路上，上架后在小红书说一声</div>
+      </div>
+      <div class="qr-slot">
+        <img id="qrImg" src="assets/qr.png" alt="小红书 @鱼一朵 二维码"
+             onerror="this.style.display='none';document.getElementById('qrPh').style.display='flex';" />
+        <div class="qr-ph" id="qrPh" style="display:none;">
+          <span>二维码位<br/><small>把 qr.png 放进 assets/</small></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 配置 -->
+  <div class="settings hidden" id="settingsPanel">
+    <p class="lead" style="margin-bottom:6px;">可选：接入 OpenAI 兼容接口，让预演与追问由真模型生成（留空则用本地引擎，演示同样完整）。</p>
+    <label>Base URL</label><input id="cfgBase" placeholder="https://api.openai.com/v1" />
+    <label>API Key</label><input id="cfgKey" type="password" placeholder="sk-..." />
+    <label>Model</label><input id="cfgModel" placeholder="gpt-4o-mini" />
+    <div class="row" style="margin-top:12px;">
+      <button class="btn clay" id="saveCfg" style="padding:10px 22px;font-size:15px;">保存</button>
+      <span id="cfgStatus" style="font-size:13px;color:var(--ink-soft);"></span>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
