@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>UBTI · 先认清你是什么人，再预演你的大学生活</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+<meta name="description" content="UBTI 自建十六型人格测验，把你写下的大学忐忑，预演成上课、破冰、恋爱、社交、社团、考试周、宿舍夜聊七幕。" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -58,6 +60,7 @@
       </div>
     </div>
     <div class="dim-box" id="dimBars"></div>
+    <div class="tie-note hidden" id="tieNote"></div>
     <div class="row" style="margin-top:20px;">
       <button class="btn" id="toAnxietyBtn">把我的忐忑写下来，预演四年</button>
     </div>
@@ -78,6 +81,7 @@
     <div class="loader">
       <div class="spinner"></div>
       <p class="lead" id="loadingText">正在把你写下的忐忑，预演成会发生的日常……</p>
+      <button class="btn ghost hidden" id="skipLLM" style="margin-top:18px;padding:10px 22px;font-size:14px;">等太久？直接用本地引擎生成</button>
     </div>
   </section>
 
@@ -143,6 +147,7 @@
     <label>Model</label><input id="cfgModel" placeholder="gpt-4o-mini" />
     <div class="row" style="margin-top:12px;">
       <button class="btn clay" id="saveCfg" style="padding:10px 22px;font-size:15px;">保存</button>
+      <button class="btn ghost" id="clearCfg" style="padding:10px 18px;font-size:14px;">清除</button>
       <span id="cfgStatus" style="font-size:13px;color:var(--ink-soft);"></span>
     </div>
   </div>

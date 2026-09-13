@@ -86,9 +86,16 @@ textarea:focus { outline: none; border-color: var(--sage); }
 .dim-o { width: 78px; color: #a0998c; flex: none; }
 .dim-bar { flex: 1; height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; }
 .dim-bar > span { display: block; height: 100%; background: var(--sage); border-radius: 999px; }
+/* 平票维度：用陶土色标出，避免"明明一半一半却给了确定类型"的错觉 */
+.dim.tie .dim-bar > span { background: var(--clay); opacity: .8; }
+.dim.tie .dim-r { color: var(--clay); font-size: 13px; letter-spacing: .04em; }
+.tie-note {
+  margin-top: 10px; font-size: 13.5px; line-height: 1.8; color: var(--ink-soft);
+  background: var(--bg-soft); border-left: 3px solid var(--clay); border-radius: 8px; padding: 10px 14px;
+}
 
 /* 场景 */
-.scene { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; }
+.scene { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; break-inside: avoid; }
 .scene-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
 .scene-emoji { font-size: 20px; }
 .scene-title { font-size: 19px; font-weight: 700; }
@@ -136,12 +143,32 @@ textarea:focus { outline: none; border-color: var(--sage); }
 .footer-note { margin-top: 30px; font-size: 13px; color: var(--ink-soft); line-height: 1.8; }
 
 @media (max-width: 560px) {
+  .wrap { padding: 32px 18px 72px; }
+  /* 桌面 40px 的标题在手机上会折成三行，压到 29px 并放开硬换行，让它自然折 */
+  h1 { font-size: 29px; line-height: 1.32; }
+  h1 br { display: none; }
+  h2 { font-size: 22px; }
+  .lead { font-size: 16px; line-height: 1.85; }
+  .q-text { font-size: 19px; }
   .arch-card { flex-direction: column; align-items: center; text-align: center; }
   .avatar { width: 108px; height: 108px; }
+  .arch-name { font-size: 27px; }
+  .split-item { flex-direction: column; gap: 2px; }
+  .split-k { width: auto; }
+  .dim { font-size: 13px; gap: 8px; }
+  .dim-l, .dim-o { width: 62px; }
+  .dim-l, .dim-o { font-size: 12px; }
+  .daily-q { font-size: 20px; }
+  .daily-box { padding: 18px 16px; }
   .cta { flex-direction: column; text-align: center; }
+  .btn { font-size: 16px; padding: 13px 24px; }
 }
 @media print {
   .topbar, .btn, .settings, .footer-note, .row, .linkbtn { display: none !important; }
   body { background: #fff; }
   .wrap { padding: 0; }
+  /* 只印当前这一屏，其余屏彻底不占位 */
+  .screen { display: none !important; }
+  .screen.active { display: block !important; animation: none; }
+  .arch-card, .scene, .dim-box { box-shadow: none; }
 }

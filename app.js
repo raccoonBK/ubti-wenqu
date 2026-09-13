@@ -155,8 +155,18 @@ const TYPES = {
      社团     H/A · E/D · P/T      考试周 H/A · C/I · E/D
      宿舍夜聊 H/A · C/I · E/D
    四个维度均匀铺进七幕，任意两种类型最多只会有两幕读到相同文字。
-   gen(t, anx, c)  c = 四字母代码，c[0]=H/A c[1]=C/I c[2]=E/D c[3]=P/T
+   gen(t, anx, c, u)  c = 四字母代码，c[0]=H/A c[1]=C/I c[2]=E/D c[3]=P/T
+                      u = 这一幕是否引用用户写下的忐忑（见 ANCHOR）
+   引用控制在 3 幕：破冰与宿舍夜聊固定锚定，第三幕按 H/A 分派，
+   其余幕让位给类型自身的"怕"，避免同一句话反复贴、读起来发机械。
    -------------------------------------------- */
+const ANCHOR = [1, 6];            // 破冰 · 宿舍夜聊
+function anxScenes(code) {
+  const s = new Set(ANCHOR);
+  s.add(code && code[0] === 'H' ? 5 : 3);   // H 型落在考试周（情绪），A 型落在社交（行动）
+  return s;
+}
+
 const SCENES = [
   { emoji: '📚', title: '上课', gen: (t, anx, c) => [
     `头几节大课你坐在后排，半节课没抬头。脑子里过的不是公式，是${c[0] === 'H' ? '刚才那句话是不是说错了' : '这周的清单还剩几项'}。`,
@@ -169,14 +179,14 @@ const SCENES = [
     `期末你发现，真正记住的不是知识点，是"${t.fear}"这件事本身。`,
   ] },
 
-  { emoji: '🤝', title: '破冰', gen: (t, anx, c) => [
+  { emoji: '🤝', title: '破冰', gen: (t, anx, c, u) => [
     `新生破冰那场，别人还在找借口溜，你${t.move}。`,
     c[1] === 'C'
       ? `散场时你手机里多了十几个好友，四个小时后群里还有人说话。`
       : `你提前撤了，回去的路上才觉得终于喘上气——社交对你从来不是充电，是耗电。`,
     `${c[2] === 'E' ? '你提前想好了要说什么、几点撤，所以那天比想象中顺。' : '你什么都没准备就去了，结果意外地撑到了最后。'}${c[3] === 'P' ? '最后你只和一个人聊了很久，那一个后来成了你四年里最常联系的人。' : '你加了一堆人，大半没再说过话，但那天你觉得自己什么都沾了一点。'}`,
-    anx ? `你曾写下：「${anx}」。可那天你忙着把场子接住，差点忘了自己原本也怕。`
-        : `你原本以为自己会缩在角落，结果那一晚比想象中好过。`,
+    u && anx ? `你曾写下：「${anx}」。可那天你忙着把场子接住，差点忘了自己原本也怕。`
+             : `你原本以为自己会缩在角落，结果那一晚比想象中好过。`,
   ] },
 
   { emoji: '💌', title: '恋爱', gen: (t, anx, c) => [
@@ -190,11 +200,11 @@ const SCENES = [
     `你慢慢明白，好的关系不是把你改造成谁，是让你更像自己。`,
   ] },
 
-  { emoji: '🌃', title: '社交', gen: (t, anx, c) => [
+  { emoji: '🌃', title: '社交', gen: (t, anx, c, u) => [
     `迎新夜的操场人声鼎沸。${c[1] === 'C' ? '你身边很快聚起几个同频的，散场还约了第二天一起吃饭。' : '你在边上站了一会儿，和一个同样站着的人聊起来——通常这种更聊得来。'}`,
     `${c[2] === 'E' ? '你出门前就想好了待多久、什么时候走。' : '你是被拉来的，连跟谁一起来的都记不太清。'}${c[3] === 'P' ? '你只在乎有没有遇到真正对的那一个。' : '你谁都聊两句，一晚上下来收获了不少名字。'}`,
-    anx ? `那句「${anx}」，后来变成你筛掉无效热闹的标准，反而轻松了。`
-        : `你不再强迫自己场场都在，留下的都是真的。`,
+    u && anx ? `那句「${anx}」，后来变成你筛掉无效热闹的标准，反而轻松了。`
+             : `你不再强迫自己场场都在，留下的都是真的。`,
   ] },
 
   { emoji: '🎯', title: '社团', gen: (t, anx, c) => [
@@ -206,7 +216,7 @@ const SCENES = [
     `换届那天，前辈把一块硬盘交给你，里面是三年的资料和你还没听过的故事。`,
   ] },
 
-  { emoji: '☕', title: '考试周', gen: (t, anx, c) => [
+  { emoji: '☕', title: '考试周', gen: (t, anx, c, u) => [
     c[2] === 'E'
       ? `考试周前两周你就排好了复习表，到考前那一晚反而最松——该做的都做完了。`
       : `前两周你一直没动，直到考前三天才真正打开书，然后发现自己居然能连轴转。`,
@@ -216,11 +226,11 @@ const SCENES = [
     c[1] === 'C'
       ? `图书馆你占了一整排位置，顺手也帮同学留了座。`
       : `你找了个最角落的位置，一个人待到闭馆。`,
-    anx ? `你写在便签上的「${anx}」，考完随手塞进书里，后来再看到，已经像别人的事了。`
-        : `你学会了和紧绷共处，它不再是你的问题，只是背景音。`,
+    u && anx ? `你写在便签上的「${anx}」，考完随手塞进书里，后来再看到，已经像别人的事了。`
+             : `你学会了和紧绷共处，它不再是你的问题，只是背景音。`,
   ] },
 
-  { emoji: '🌙', title: '宿舍夜聊', gen: (t, anx, c) => [
+  { emoji: '🌙', title: '宿舍夜聊', gen: (t, anx, c, u) => [
     `熄灯后的宿舍夜聊，是你大学里最私密的剧场。${c[1] === 'C' ? '你总能把话题接下去，谁有心事你都听得出来。' : '你不怎么开口，但那一晚每个人说了什么，你后来都记得。'}`,
     c[0] === 'H'
       ? `有人讲起家里的难处，你没给建议，只说了句「真的挺难的」——他后来一直记得这句。`
@@ -228,8 +238,8 @@ const SCENES = [
     c[2] === 'E'
       ? `你早就想好了四年之后要去哪，所以那晚你听得格外安静。`
       : `你从来没想过四年之后的事，所以那晚你听得格外起劲。`,
-    anx ? `你也曾把「${anx}」咽回去没说，可那晚你发现，说出来的人，反而睡得最沉。`
-        : `你学会了一件事：脆弱被看见，不是弱点，是连接开始的信号。`,
+    u && anx ? `你也曾把「${anx}」咽回去没说，可那晚你发现，说出来的人，反而睡得最沉。`
+             : `你学会了一件事：脆弱被看见，不是弱点，是连接开始的信号。`,
     `很多年后你忘了考过的试，却记得这几个夜里，谁先开了口。`,
   ] },
 ];
@@ -263,11 +273,17 @@ const FOLLOWUPS = [
 ];
 
 /* ---------------- 状态 ---------------- */
-const state = { answers: [], qi: 0, code: '', dailyIdx: 0 };
+const state = { answers: [], qi: 0, code: '', dailyIdx: 0, locked: false };
 
 const $ = (id) => document.getElementById(id);
 const SCREENS = ['landing', 'quiz', 'result', 'anxiety', 'loading', 'preview', 'daily'];
 function show(n) { SCREENS.forEach(s => $(s).classList.toggle('active', s === n)); }
+
+/* 转义：场景正文走 innerHTML，用户写下的忐忑必须先转义，杜绝注入 */
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, m =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
 
 /* ---------------- 测验 ---------------- */
 const FLAT = [];
@@ -287,10 +303,13 @@ function renderQ() {
   });
 }
 function nextQ(el) {
+  if (state.locked) return;            // 防连点：动画未走完时不再接受第二下
+  state.locked = true;
   [...$('qOptions').children].forEach(o => o.classList.remove('chosen'));
   el.classList.add('chosen');
   setTimeout(() => {
     state.qi++;
+    state.locked = false;
     if (state.qi < FLAT.length) renderQ(); else finishQuiz();
   }, 170);
 }
@@ -298,27 +317,32 @@ function nextQ(el) {
 function finishQuiz() {
   let code = '';
   const bars = [];
+  let ties = 0;
   DIMS.forEach((d, di) => {
     const picks = [];
-    FLAT.forEach((f, i) => { if (f.di === di) picks.push(state.answers[i]); });
+    FLAT.forEach((f, i) => { if (f.di === di && state.answers[i]) picks.push(state.answers[i]); });
     const a = picks.filter(p => p === 'a').length;
-    const b = picks.length - a;
+    const b = picks.filter(p => p === 'b').length;
+    const n = Math.max(a + b, 1);
+    const tie = a === b;
+    if (tie) ties++;
     const win = a >= b ? 'a' : 'b';
-    const pct = Math.round(Math.max(a, b) / picks.length * 100);
+    const pct = Math.round(Math.max(a, b) / n * 100);
     code += d[win].l;
-    bars.push({ pole: d[win], other: d[win === 'a' ? 'b' : 'a'], pct });
+    bars.push({ pole: d[win], other: d[win === 'a' ? 'b' : 'a'], pct, tie });
   });
   state.code = code;
-  renderResult(code, bars);
+  renderResult(code, bars, ties);
   show('result');
 }
 
 /* ---------------- 类型卡 ---------------- */
-function renderResult(code, bars) {
-  const t = TYPES[code] || TYPES.HCEP;
+function renderResult(code, bars, ties) {
+  const safeCode = TYPES[code] ? code : 'HCEP';
+  const t = TYPES[safeCode];
   ['archAvatar', 'previewAvatar'].forEach(id => {
     const el = $(id);
-    if (el) el.src = `assets/${TYPES[code] ? code : 'HCEP'}.png`;
+    if (el) el.src = `assets/${safeCode}.png`;
   });
   $('archCode').textContent = code;
   $('archWords').textContent = code.split('').map(c => LETTER[c] || '').join(' · ');
@@ -332,13 +356,26 @@ function renderResult(code, bars) {
   const box = $('dimBars'); box.innerHTML = '';
   bars.forEach(b => {
     const row = document.createElement('div');
-    row.className = 'dim';
+    row.className = 'dim' + (b.tie ? ' tie' : '');
     row.innerHTML = `<span class="dim-l">${b.pole.l} ${b.pole.n}</span>
       <div class="dim-bar"><span style="width:${b.pct}%"></span></div>
-      <span class="dim-r">${b.pct}%</span>
+      <span class="dim-r">${b.tie ? '持平' : b.pct + '%'}</span>
       <span class="dim-o">${b.other.l} ${b.other.n}</span>`;
     box.appendChild(row);
   });
+
+  const note = $('tieNote');
+  if (note) {
+    if (ties > 0) {
+      note.textContent = ties >= 3
+        ? `有 ${ties} 个维度你两边选得一样多——说明你本来就是个两边都站得住的人，这一版先按前者给你，重测时跟着第一反应走会更准。`
+        : `有 ${ties} 个维度两边持平（标"持平"的那些），这一版先取了前者；换种答法可能就是隔壁那一型。`;
+      note.classList.remove('hidden');
+    } else {
+      note.textContent = '';
+      note.classList.add('hidden');
+    }
+  }
 }
 
 /* ---------------- 预演 ---------------- */
@@ -347,31 +384,42 @@ function shortAnx() {
   return raw ? (raw.length > 28 ? raw.slice(0, 28) + '…' : raw) : '';
 }
 function buildScenes(t, anx, c) {
-  return SCENES.map(s => ({ emoji: s.emoji, title: s.title, body: s.gen(t, anx, c || state.code).join('') }));
+  const code = c || state.code;
+  const anchor = anxScenes(code);
+  return SCENES.map((s, i) => ({ emoji: s.emoji, title: s.title, body: s.gen(t, anx, code, anchor.has(i)).join('') }));
 }
 
 function loadCfg() { try { return JSON.parse(localStorage.getItem('ubti_cfg') || 'null'); } catch { return null; } }
 
-async function callLLM(t, anx) {
+async function callLLM(t, anx, shouldAbort) {
   const cfg = loadCfg();
   if (!cfg || !cfg.base || !cfg.key) return null;
   const list = SCENES.map(s => s.title).join('、');
   const prompt = `你在帮大学新生预演生活。用户的 UBTI 类型是「${state.code} ${t.name}」：${t.persona}
 他的特质是：${t.strength}，习惯${t.move}，心里怕的是「${t.fear}」。
 用户写下的期待/焦虑是：「${anx || '（未填写）'}」。
-请为这 7 个场景各写一段 3-4 句、以"你"为主角的预演文字，把人格特质和那句焦虑自然织进去。语气真诚克制，像真的会发生。场景：${list}。
-只输出 JSON 数组，7 个字符串，顺序对应，不要多余说明。`;
+请为这 7 个场景各写一段 3-4 句、以"你"为主角的预演文字，把人格特质自然织进去。
+语气真诚克制，像真的会发生，不要鸡汤、不要总结式升华。
+那句焦虑最多在两幕里直接引用原话，其余场景不要再重复贴上这句原话，改成写它带来的影响。
+只输出 JSON 数组，7 个字符串，顺序对应以下场景，不要多余说明。场景：${list}。`;
+  /* 超时保护：接口不通时 9 秒后自动回落本地引擎，绝不让页面卡在转圈。
+     同时每 120ms 检查一次"用户点了跳过"。 */
+  const ac = new AbortController();
+  const killer = setTimeout(() => ac.abort(), 9000);
+  const poll = setInterval(() => { if (shouldAbort && shouldAbort()) ac.abort(); }, 120);
   try {
     const res = await fetch(`${cfg.base.replace(/\/$/, '')}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cfg.key}` },
-      body: JSON.stringify({ model: cfg.model || 'gpt-4o-mini', messages: [{ role: 'user', content: prompt }], temperature: 0.9 })
+      body: JSON.stringify({ model: cfg.model || 'gpt-4o-mini', messages: [{ role: 'user', content: prompt }], temperature: 0.9 }),
+      signal: ac.signal
     });
     if (!res.ok) return null;
     const data = await res.json();
     const arr = JSON.parse((data.choices?.[0]?.message?.content || '').replace(/```json|```/g, '').trim());
     if (Array.isArray(arr) && arr.length === 7) return SCENES.map((s, i) => ({ emoji: s.emoji, title: s.title, body: arr[i] }));
-  } catch (e) { /* 回落到本地引擎 */ }
+  } catch (e) { /* 超时/网络错误/解析失败 → 回落到本地引擎 */ }
+  finally { clearTimeout(killer); clearInterval(poll); }
   return null;
 }
 
@@ -379,13 +427,24 @@ async function generate() {
   const t = TYPES[state.code] || TYPES.HCEP;
   const anx = shortAnx();
   show('loading');
+
+  /* 只在等待超过 4 秒后才露出"跳过"入口，正常本地引擎不会看到它 */
+  let skip = false;
+  const skipBtn = $('skipLLM');
+  if (skipBtn) {
+    skipBtn.classList.add('hidden');
+    skipBtn.onclick = () => { skip = true; };
+    setTimeout(() => { if (!skip) skipBtn.classList.remove('hidden'); }, 4000);
+  }
+
   const dots = ['正在把你写下的忐忑，预演成会发生的日常……', '正在对照你的 UBTI 类型，编织每一幕……', '快好了，最后把焦虑折成开头……'];
   let i = 0; const timer = setInterval(() => { i = (i + 1) % dots.length; $('loadingText').textContent = dots[i]; }, 700);
 
-  let scenes = await callLLM(t, anx);
-  const usedLLM = !!scenes;
-  if (!scenes) scenes = buildScenes(t, anx, state.code);
+  let scenes = await callLLM(t, anx, () => skip);
+  const usedLLM = !!scenes && !skip;
+  if (!scenes || skip) scenes = buildScenes(t, anx, state.code);
   clearInterval(timer);
+  if (skipBtn) skipBtn.classList.add('hidden');
 
   $('archAnxiety').textContent = anx
     ? `「${anx}」——你带来的忐忑，下面是被它牵着走、又把它接住的四年。`
@@ -393,7 +452,7 @@ async function generate() {
   const box = $('scenes'); box.innerHTML = '';
   scenes.forEach(s => {
     const d = document.createElement('div'); d.className = 'scene';
-    d.innerHTML = `<div class="scene-head"><span class="scene-emoji">${s.emoji}</span><span class="scene-title">${s.title}</span></div><div class="scene-body">${s.body}</div>`;
+    d.innerHTML = `<div class="scene-head"><span class="scene-emoji">${esc(s.emoji)}</span><span class="scene-title">${esc(s.title)}</span></div><div class="scene-body">${esc(s.body)}</div>`;
     box.appendChild(d);
   });
   $('engineNote').textContent = usedLLM ? '＊ 本预演由接入的大模型实时生成。' : '＊ 本预演由本地叙事引擎生成（无需联网/密钥）。接入 OpenAI 兼容接口后可升级为真模型生成。';
@@ -415,6 +474,8 @@ async function submitDaily() {
   const cfg = loadCfg();
   if (cfg && cfg.base && cfg.key) {
     // 真模型追问：按问渠口径——不挖事件，只挖"这件事碰到了你的什么"
+    const ac = new AbortController();
+    const killer = setTimeout(() => ac.abort(), 8000);
     try {
       const res = await fetch(`${cfg.base.replace(/\/$/, '')}/chat/completions`, {
         method: 'POST',
@@ -423,12 +484,14 @@ async function submitDaily() {
           model: cfg.model || 'gpt-4o-mini',
           messages: [{ role: 'user', content: `你是「问渠」。用户刚回答：${ans}\n原问题：${DAILY_Q[state.dailyIdx % DAILY_Q.length]}\n严格规则：只输出一句追问，≤40字，特殊疑问句；严禁挖事件的客观内容（谁/几点/多久/结果）；严禁名词解释式追问；严禁比喻文学化；问的是"这件事碰到了你的什么"。` }],
           temperature: 0.9
-        })
+        }),
+        signal: ac.signal
       });
       const d = await res.json();
       const txt = (d.choices?.[0]?.message?.content || '').trim();
       if (txt) { $('dailyFollow').textContent = txt; $('dailyFollow').classList.remove('hidden'); return; }
-    } catch (e) { /* 回落本地 */ }
+    } catch (e) { /* 回落本地追问 */ }
+    finally { clearTimeout(killer); }
   }
   const f = FOLLOWUPS[Math.floor(Math.random() * FOLLOWUPS.length)];
   $('dailyFollow').textContent = f;
@@ -441,13 +504,13 @@ function toast(msg) {
 }
 
 /* ---------------- 绑定 ---------------- */
-$('startBtn').onclick = () => { state.qi = 0; state.answers = []; renderQ(); show('quiz'); };
+$('startBtn').onclick = () => { state.qi = 0; state.answers = []; state.locked = false; renderQ(); show('quiz'); };
 $('toAnxietyBtn').onclick = () => show('anxiety');
 $('previewBtn').onclick = generate;
 $('toDailyBtn').onclick = () => { renderDaily(); show('daily'); };
 $('dailySubmit').onclick = submitDaily;
 $('dailyShuffle').onclick = () => { state.dailyIdx++; renderDaily(); };
-$('restartBtn').onclick = () => { state.qi = 0; state.answers = []; show('landing'); };
+$('restartBtn').onclick = () => { state.qi = 0; state.answers = []; state.locked = false; show('landing'); };
 $('printBtn').onclick = () => window.print();
 
 $('settingsToggle').onclick = () => $('settingsPanel').classList.toggle('hidden');
@@ -455,6 +518,12 @@ $('saveCfg').onclick = () => {
   const cfg = { base: $('cfgBase').value.trim(), key: $('cfgKey').value.trim(), model: $('cfgModel').value.trim() };
   localStorage.setItem('ubti_cfg', JSON.stringify(cfg));
   $('cfgStatus').textContent = cfg.key ? '已保存，将用真模型生成' : '已保存（未填密钥，仍用本地引擎）';
+};
+/* 密钥明文存在本机 localStorage，给一个明确的清除出口 */
+$('clearCfg').onclick = () => {
+  localStorage.removeItem('ubti_cfg');
+  ['cfgBase', 'cfgKey', 'cfgModel'].forEach(id => { $(id).value = ''; });
+  $('cfgStatus').textContent = '已清除，回到本地叙事引擎';
 };
 
 (function init() {
